@@ -1,0 +1,28 @@
+routing-instances {
+	{% for index, vpn in enum(vpns) %}
+    VPLS-EVPN-{{ vpn }} {
+        instance-type evpn;
+        {% if side == 'left'%}
+            {% for unit in units %}
+        interface {{ base_interface }}.{{ base_unit + unit + units|length * index }};
+            {% endfor %}
+        {% else %}
+        interface {{ base_interface }}.{{ base_unit + units|length * index }};
+        {% endif %}
+        route-distinguisher {{ rd }}:{{ vpn }};
+        vrf-target target:64774:{{ vpn }};
+        protocols {
+            evpn {
+                {% if side == 'left'%}
+                    {% for unit in units %}
+                interface {{ base_interface }}.{{ base_unit + unit + units|length * index }};
+                    {% endfor %}
+                {% else %}
+                interface {{ base_interface }}.{{ base_unit + units|length * index }};
+                {% endif %}
+            }
+        }
+    }
+    {% endfor %}
+}
+

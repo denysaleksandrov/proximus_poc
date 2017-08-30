@@ -1,0 +1,18 @@
+interfaces {
+    {{ base_interface }} {
+        {% for index, vpn in enum(vpns) %}
+        {% for unit, address, v6address, ivlan in zip(units, subnets, v6subnets, inner_vlans) %}
+        unit {{ unit+index*nu }} {
+            description "AC-IPVPN-{{ vpn }} outer-vlan {{ (vpn[0]+vpn[2:]) | int +outer_offset }} inner-vlan {{ ivlan+inner_offset }}";
+            vlan-tags outer {{ (vpn[0]+vpn[2:]) | int + outer_offset }} inner {{ ivlan+inner_offset }};
+            family inet {
+                address {{ address[gw] }}/27;
+            }
+            family inet6 {
+                address {{ v6address[gw] }}/112;
+            }
+        }
+        {% endfor %}
+        {% endfor %}
+    }
+}

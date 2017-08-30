@@ -1,0 +1,27 @@
+interfaces {
+    {{ base_interface }} {
+        {% if side == 'right' %}
+        {% for unit, esi, vpn in zip(right_units, esis, vpns) %}
+        unit {{ unit }} {
+            description "AC-VPLS-EVPN-{{ vpn }} outer-vlan {{ vpn|int + 100 }} inner-vlan {{ 1  + inner_offset }}";
+            encapsulation vlan-bridge;
+            vlan-tags outer {{ vpn|int + 100 }} inner {{ 1 + inner_offset }};
+            {% if esi_exists %}
+            esi {
+                {{ esi }};
+                all-active;
+            }
+			{% endif %}
+        }
+        {% endfor %}
+        {% else %}
+        {% for unit, inner, outer, vpn in zip(left_units, inner_vlans, outer_vlans, left_vpns) %}
+        unit {{ unit }} {
+            description "AC-VPLS-EVPN-{{ vpn }} outer-vlan {{ outer + outer_offset }} inner-vlan {{ inner + inner_offset }}";
+            encapsulation vlan-bridge;
+            vlan-tags outer {{ outer + outer_offset }} inner {{ inner + inner_offset }};
+        }
+        {% endfor %}
+        {% endif %}
+    }
+}

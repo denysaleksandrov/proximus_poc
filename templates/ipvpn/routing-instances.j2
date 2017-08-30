@@ -1,0 +1,14 @@
+routing-instances {
+	{% for index, vpn in enum(vpns) %}
+    IPVPN-{{ vpn }} {
+        instance-type vrf;
+        {% for unit in units %}
+        interface {{ base_interface }}.{{ unit + index*number_of_units }};
+        {% endfor %}
+        route-distinguisher {{ rd }}:{{ vpn }};
+        vrf-target target:64774:{{ vpn }};
+        vrf-table-label;
+    }
+    {% endfor %}
+}
+

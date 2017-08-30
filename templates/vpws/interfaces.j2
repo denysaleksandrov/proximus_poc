@@ -1,0 +1,17 @@
+interfaces {
+    {{ base_interface }} {
+        {% for vpn, inner_vlan, esi in zip(vpns, inner_vlans, esis) %}
+        unit {{ vpn }} {
+            description "AC-VPWS-EVPN-{{ vpn }} outer-vlan {{ (vpn | int - 1)//10 + 1 + outer_offset }} inner-vlan {{ (vpn | int)%10 + inner_offset }}";
+            encapsulation vlan-ccc;
+            vlan-tags outer {{ (vpn | int - 1)//10 + 1 +  outer_offset }} inner {{ (vpn | int)%10 + inner_offset }};
+            {% if esi_exists %}
+            esi {
+                {{ esi }};
+                single-active;
+            }
+			{% endif %}
+        }
+        {% endfor %}
+    }
+}

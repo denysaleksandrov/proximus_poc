@@ -1,0 +1,26 @@
+routing-instances {
+	{% for vpn in vpns %}
+    VPWS-EVPN-{{ vpn }} {
+        instance-type evpn-vpws;
+        interface {{ base_interface }}.{{ vpn }};
+        route-distinguisher {{ rd }}:{{ vpn }};
+        vrf-target target:64774:{{ vpn }};
+        protocols {
+            evpn {
+                interface {{ base_interface }}.{{ vpn }} {
+                    vpws-service-id {
+                        {% if side == 'right'%}
+                        local 1015{{ vpn }};
+                        remote 1011{{ vpn }};
+                        {% elif side == 'left' %}
+                        local 1011{{ vpn }};
+                        remote 1015{{ vpn }};
+                        {% endif %}
+                    }
+                }
+            }
+        }
+    }
+    {% endfor %}
+}
+
